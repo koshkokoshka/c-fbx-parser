@@ -14,7 +14,7 @@ void PrintNodeNames(int gap, FBXNodeList *node_list)
         }
         printf("- %s\n", node->name);
 
-        // Print sub node_list
+        // Print subnodes
         if (node->subnodes != NULL) {
             PrintNodeNames(gap + 1, node->subnodes);
         }

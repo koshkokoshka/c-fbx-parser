@@ -4,6 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * Create and initialize an FBXNodeList with a specified initial capacity
+ *
+ * @param initial_capacity The number of `FBXNode` items the list can initially hold before a resize may be required
+ *
+ * @return On successful creation, returns a pointer to the new `FBXNodeList`.
+ *         Otherwise, the function returns NULL.
+ */
 FBXNodeList *FBXNodeList_Create(size_t initial_capacity)
 {
     FBXNodeList *list = malloc(sizeof(FBXNodeList));
@@ -27,6 +35,15 @@ FBXNodeList *FBXNodeList_Create(size_t initial_capacity)
     return list;
 }
 
+/**
+ * Resizes the internal nodes array of an FBXNodeList to the specified capacity
+ *
+ * @param list Pointer to the FBXNodeList that should be resized
+ * @param capacity The new capacity for the `FBXNodeList` nodes array
+ *
+ * @return Returns true if the resizing operation is successful.
+ *         Returns false if memory allocation or reallocation fails.
+ */
 bool FBXNodeList_Resize(FBXNodeList *list, size_t capacity)
 {
     void *memory_address;
@@ -43,6 +60,14 @@ bool FBXNodeList_Resize(FBXNodeList *list, size_t capacity)
     return true;
 }
 
+/**
+ * Truncates the internal nodes array of an FBXNodeList to its current length
+ *
+ * @param list Pointer to the FBXNodeList that should be truncated
+ *
+ * @return Returns true if the truncation operation is successful or if no truncation was needed.
+ *         Returns false if resizing the memory fails.
+ */
 bool FBXNodeList_Truncate(FBXNodeList *list)
 {
     if (list->length == list->capacity) {
@@ -51,6 +76,17 @@ bool FBXNodeList_Truncate(FBXNodeList *list)
     return FBXNodeList_Resize(list, list->length);
 }
 
+/**
+ * Inserts a new node into an FBXNodeList
+ *
+ * If the list's current capacity is insufficient to accommodate the new node, the function will attempt to grow the capacity
+ *
+ * @param list Pointer to the FBXNodeList into which the node should be inserted
+ * @param node Pointer to the FBXNode that should be inserted into the list
+ *
+ * @return Returns true if the node is successfully inserted into the list.
+ *         Returns false if there's a failure during memory resizing.
+ */
 bool FBXNodeList_Insert(FBXNodeList *list, FBXNode *node)
 {
     size_t new_length = list->length + 1;
@@ -72,6 +108,15 @@ bool FBXNodeList_Insert(FBXNodeList *list, FBXNode *node)
     return true;
 }
 
+/**
+ * Parses a single property of an FBX node from an open .FBX file
+ *
+ * @param file Pointer to the open .FBX file
+ * @param property Pointer to an FBXNodeProperty structure where the parsed property details will be stored
+ *
+ * @return Returns true if the node property is successfully parsed from the file.
+ *         Returns false if an error occurs during the reading.
+ */
 bool FBX_ParseNodeProperty(FILE *file, FBXNodeProperty *property)
 {
     // Read property type
@@ -176,6 +221,15 @@ bool FBX_ParseNodeProperty(FILE *file, FBXNodeProperty *property)
     return true;
 }
 
+/**
+ * @brief Parses a single FBX node from an open .FBX file
+ *
+ * @param file Pointer to the open .FBX file
+ * @param node Pointer to an FBXNode structure where the parsed details will be stored
+ *
+ * @return Returns true if the node is successfully parsed from the file.
+ *         Returns false if an error occurs during the reading.
+ */
 bool FBX_ParseNode(FILE *file, FBXNode *node)
 {
     // Read node record
@@ -202,7 +256,6 @@ bool FBX_ParseNode(FILE *file, FBXNode *node)
         return false; // failed to read a node name
     }
     node->name[node->name_length] = '\0'; // end string with the '\0' character
-//    fseek(file, node->name_length, SEEK_CUR);
 
     // Read node properties
     FBXNodeProperty property;
@@ -211,18 +264,27 @@ bool FBX_ParseNode(FILE *file, FBXNode *node)
             return false;
         }
     }
-//    fseek(file, node->properties_list_length, SEEK_CUR);
 
     return true;
 }
 
+/**
+ * Parses nodes list from an .FBX file
+ *
+ * @param file Pointer to the open .FBX file
+ *
+ * @return If successful, returns a pointer to an `FBXNodeList` containing the parsed nodes from the .FBX file.
+ *         If an error occurs or if there are no more nodes to parse, it returns NULL.
+ */
 FBXNodeList *FBX_ParseNodes(FILE *file)
 {
+    // Create a node list
     FBXNodeList *list = FBXNodeList_Create(0);
     if (list == NULL) {
         return NULL;
     }
 
+    // Parse nodes
     while (1) {
         FBXNode node;
         memset(&node, 0, sizeof(FBXNode));
@@ -230,29 +292,35 @@ FBXNodeList *FBX_ParseNodes(FILE *file)
             break;
         }
         if (node.end_offset == 0) {
-            break; // no more list
+            break; // no more nodes
         }
 
+        // If the current file position is not equal to the end offset of the node,
+        // this means that the node has child subnodes
         if (ftell(file) != node.end_offset) {
-            // Recursive parse subnodes
-            node.subnodes = FBX_ParseNodes(file);
-
-            // Skip to the next node
-            if (fseek(file, node.end_offset, SEEK_SET) != 0) {
-                break;
-            }
+            node.subnodes = FBX_ParseNodes(file); // parse subnodes recursively
         }
 
+        //
         if (FBXNodeList_Insert(list, &node) == false) {
             break;
         }
     }
 
+    // Shrink the array capacity to the actual length. This optimizes memory usage.
     FBXNodeList_Truncate(list);
 
     return list;
 }
 
+/**
+ * Parses an .FBX file and returns a list of root nodes
+ *
+ * @param path Pointer to a null-terminated string specifying the path to the .FBX file
+ *
+ * @return If successful, returns a pointer to an `FBXNodeList` containing the root nodes of the parsed .FBX file.
+ *         If an error occurs at any step or if the file isn't a valid .FBX file, it returns NULL.
+ */
 FBXNodeList *FBX_Parse(const char *path)
 {
     FBXNodeList *nodes = NULL;
@@ -260,30 +328,30 @@ FBXNodeList *FBX_Parse(const char *path)
     // Open file handle
     FILE *file = NULL;
     if (fopen_s(&file, path, "rb") != 0) {
-        goto FUNCTION_END;
+        goto FBX_PARSE_END;
     }
 
     // Check file signature
     char buffer[21];
     fread(buffer, 21, 1, file);
     if (ferror(file) != 0) {
-        goto FUNCTION_END;
+        goto FBX_PARSE_END;
     }
     const char *FBX_SIGNATURE = "Kaydara FBX Binary  ";
     if (strncmp(buffer, FBX_SIGNATURE, 20) != 0) {
-        goto FUNCTION_END;
+        goto FBX_PARSE_END;
     }
 
     // Skip to the beginning of the first node
     if (fseek(file, 27, SEEK_SET) != 0) {
-        goto FUNCTION_END;
+        goto FBX_PARSE_END;
     }
 
-    // Read nodes
+    // Read root nodes
     nodes = FBX_ParseNodes(file);
 
     // Cleanup and exit
-FUNCTION_END:
+FBX_PARSE_END:
     if (file != NULL) {
         fclose(file);
     }

@@ -49,6 +49,14 @@ struct FBXNodeProperty {
     };
 };
 
+/**
+ * Parses an .FBX file and returns a list of root nodes
+ *
+ * @param path Pointer to a null-terminated string specifying the path to the .FBX file
+ *
+ * @return If successful, returns a pointer to an `FBXNodeList` containing the root nodes of the parsed .FBX file.
+ *         If an error occurs at any step or if the file isn't a valid .FBX file, it returns NULL.
+ */
 FBXNodeList *FBX_Parse(const char *path);
 
 #endif
