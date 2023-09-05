@@ -7,10 +7,10 @@
 /**
  * Create and initialize an FBXNodeList with a specified initial capacity
  *
- * @param initial_capacity The number of `FBXNode` items the list can initially hold before a resize may be required
+ * @param initial_capacity The number of FBXNode items the list can initially hold before a resize may be required
  *
- * @return On successful creation, returns a pointer to the new `FBXNodeList`.
- *         Otherwise, the function returns NULL.
+ * @return On successful creation, returns a pointer to the new FBXNodeList
+ *         Otherwise, the function returns NULL
  */
 FBXNodeList *FBXNodeList_Create(size_t initial_capacity)
 {
@@ -39,10 +39,10 @@ FBXNodeList *FBXNodeList_Create(size_t initial_capacity)
  * Resizes the internal nodes array of an FBXNodeList to the specified capacity
  *
  * @param list Pointer to the FBXNodeList that should be resized
- * @param capacity The new capacity for the `FBXNodeList` nodes array
+ * @param capacity The new capacity for the FBXNodeList nodes array
  *
- * @return Returns true if the resizing operation is successful.
- *         Returns false if memory allocation or reallocation fails.
+ * @return Returns true if the resizing operation is successful
+ *         Returns false if memory allocation or reallocation fails
  */
 bool FBXNodeList_Resize(FBXNodeList *list, size_t capacity)
 {
@@ -65,8 +65,8 @@ bool FBXNodeList_Resize(FBXNodeList *list, size_t capacity)
  *
  * @param list Pointer to the FBXNodeList that should be truncated
  *
- * @return Returns true if the truncation operation is successful or if no truncation was needed.
- *         Returns false if resizing the memory fails.
+ * @return Returns true if the truncation operation is successful or if no truncation was needed
+ *         Returns false if resizing the memory fails
  */
 bool FBXNodeList_Truncate(FBXNodeList *list)
 {
@@ -84,8 +84,8 @@ bool FBXNodeList_Truncate(FBXNodeList *list)
  * @param list Pointer to the FBXNodeList into which the node should be inserted
  * @param node Pointer to the FBXNode that should be inserted into the list
  *
- * @return Returns true if the node is successfully inserted into the list.
- *         Returns false if there's a failure during memory resizing.
+ * @return Returns true if the node is successfully inserted into the list
+ *         Returns false if there's a failure during memory resizing
  */
 bool FBXNodeList_Insert(FBXNodeList *list, FBXNode *node)
 {
@@ -114,8 +114,8 @@ bool FBXNodeList_Insert(FBXNodeList *list, FBXNode *node)
  * @param file Pointer to the open .FBX file
  * @param property Pointer to an FBXNodeProperty structure where the parsed property details will be stored
  *
- * @return Returns true if the node property is successfully parsed from the file.
- *         Returns false if an error occurs during the reading.
+ * @return Returns true if the node property is successfully parsed from the file
+ *         Returns false if an error occurs during the reading
  */
 bool FBX_ParseNodeProperty(FILE *file, FBXNodeProperty *property)
 {
@@ -227,8 +227,8 @@ bool FBX_ParseNodeProperty(FILE *file, FBXNodeProperty *property)
  * @param file Pointer to the open .FBX file
  * @param node Pointer to an FBXNode structure where the parsed details will be stored
  *
- * @return Returns true if the node is successfully parsed from the file.
- *         Returns false if an error occurs during the reading.
+ * @return Returns true if the node is successfully parsed from the file
+ *         Returns false if an error occurs during the reading
  */
 bool FBX_ParseNode(FILE *file, FBXNode *node)
 {
@@ -273,8 +273,8 @@ bool FBX_ParseNode(FILE *file, FBXNode *node)
  *
  * @param file Pointer to the open .FBX file
  *
- * @return If successful, returns a pointer to an `FBXNodeList` containing the parsed nodes from the .FBX file.
- *         If an error occurs or if there are no more nodes to parse, it returns NULL.
+ * @return If successful, returns a pointer to an FBXNodeList containing the parsed nodes from the .FBX file
+ *         If an error occurs or if there are no more nodes to parse, it returns NULL
  */
 FBXNodeList *FBX_ParseNodes(FILE *file)
 {
@@ -318,8 +318,8 @@ FBXNodeList *FBX_ParseNodes(FILE *file)
  *
  * @param path Pointer to a null-terminated string specifying the path to the .FBX file
  *
- * @return If successful, returns a pointer to an `FBXNodeList` containing the root nodes of the parsed .FBX file.
- *         If an error occurs at any step or if the file isn't a valid .FBX file, it returns NULL.
+ * @return If successful, returns a pointer to an FBXNodeList containing the root nodes of the parsed .FBX file
+ *         If an error occurs at any step or if the file isn't a valid .FBX file, it returns NULL
  */
 FBXNodeList *FBX_Parse(const char *path)
 {
