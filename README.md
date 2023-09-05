@@ -5,6 +5,6 @@ Usually, you need to include the fbx-sdk or [assimp](https://github.com/assimp/a
 
 Please note that this code is only for parsing nodes and properties. Reading and processing the model data is up to you.
 
-The research papers I used to write this parser are:
+The research papers I used to write this project:
 - https://code.blender.org/2013/08/fbx-binary-file-format-specification
 - https://liangz0707.github.io/whoimi/blogs/3DBasic/FBXFileFormat.html
